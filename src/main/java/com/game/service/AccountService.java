@@ -78,12 +78,14 @@ public class AccountService {
     }
 
     public String generateAccountNumber() {
+        System.out.println("계좌번호 발급");
         Random random = new Random();
         StringBuilder accountNumberBuilder = new StringBuilder();
         for (int i = 0; i < 12; i++) {
             int digit = random.nextInt(10);
             accountNumberBuilder.append(digit);
         }
+        System.out.println(accountNumberBuilder.toString());
         return accountNumberBuilder.toString();
     }
 }

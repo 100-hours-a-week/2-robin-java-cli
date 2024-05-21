@@ -27,36 +27,20 @@ public class GameController {
         RulePrinter rulePrinter = new RulePrinter();
         Random random = new Random();
 
-        System.out.println("start");
-
-        System.out.print("이름 입력 : ");
-        String name = sc.nextLine();
-        System.out.println("계좌번호 발급");
+        String name = InputHandler.getUserName(sc);
         String acNum = accountService.generateAccountNumber();
-        System.out.println(acNum);
+
 
         CheckAccount checkAccount = new CheckAccount(name, acNum, 0);
         SaveAccount saveAccount = new SaveAccount(name, acNum, 0);
 
-        System.out.println(checkAccount);
-        System.out.println(saveAccount);
-        System.out.println("정기예금 기간을 정해주세요.(1~6)개월 ");
-
         int period = inputHandler.getPeriodFromUser(sc, 1, END_DAY);
         FixedAccount fixedAccount = new FixedAccount(name, acNum, 0, period);
 
-        System.out.println("정기예금계좌 생성");
-        System.out.println(fixedAccount);
+        accountService.printAccountStates(checkAccount, saveAccount, fixedAccount);
 
-        while (true) {
-            boolean check = rulePrinter.printRule(sc);
-            if (!check) break;
-            System.out.println("설명 종료(y) 다시듣기(아무키나 입력)");
-            String ruleEnd = sc.nextLine().toLowerCase();
-            if (ruleEnd.equals("y")) {
-                break;
-            }
-        }
+        rulePrinter.printRule(sc);
+
 
         playGame(sc, random, checkAccount, saveAccount, fixedAccount, accountService, gameService, inputHandler);
     }
@@ -81,36 +65,40 @@ public class GameController {
             gameService.handleSavingInterest(saveAccount);
 
             amount = INITAIL_MONEY;
-            while (true) {
+            int stopCheck = 0;
+            do {
                 System.out.println("소지 잔액 : " + amount + "(소지 잔액은 다음달이 지나면 사라집니다.)");
                 System.out.println("원하는 행동을 선택해주세요.");
                 printMenu();
-                String action = sc.next();
+
+                int action = InputHandler.getUserChoice(sc, 4);
 
                 if (handleUserAction(sc, action, checkAccount, saveAccount, fixedAccount, stopFixedAccount, inputHandler, accountService)) {
-                    break;
+                    stopCheck = 1;
+                } else {
+                    stopCheck = 2;
                 }
-            }
+            } while(stopCheck == 2);
         }
         int resultMoney = checkAccount.getBalance() + saveAccount.getBalance() + fixedAccount.getBalance();
         System.out.println("6개월 동안 총 " + resultMoney + "원을 모으셨습니다.");
     }
 
-    private boolean handleUserAction(Scanner sc, String action, CheckAccount checkAccount, SaveAccount saveAccount, FixedAccount fixedAccount, boolean stopFixedAccount, InputHandler inputHandler, AccountService accountService) {
+    private boolean handleUserAction(Scanner sc, int action, CheckAccount checkAccount, SaveAccount saveAccount, FixedAccount fixedAccount, boolean stopFixedAccount, InputHandler inputHandler, AccountService accountService) {
         return switch (action) {
-            case "1" -> {
+            case 1 -> {
                 accountService.printAccountStates(checkAccount, saveAccount, fixedAccount);
                 yield false;
             }
-            case "2" -> {
+            case 2 -> {
                 amount -= accountService.depositChoice(sc, checkAccount, saveAccount, fixedAccount, inputHandler, amount, stopFixedAccount);
                 yield false;
             }
-            case "3" -> {
+            case 3 -> {
                 amount += accountService.withdrawalChoice(sc, checkAccount, saveAccount, fixedAccount, inputHandler, SAVING_WITHDRAWAL_FEE);
                 yield false;
             }
-            case "4" -> {
+            case 4 -> {
                 System.out.println("행동 종료(다음달로 넘어갑니다.)");
                 yield true;
             }
