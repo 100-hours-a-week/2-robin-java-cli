@@ -19,7 +19,7 @@ public class AccountService {
         System.out.println("4. 취소");
         System.out.println("--------------------------------------------------------------------------");
 
-        int choice = inputHandler.getUserChoice(sc, 4);
+        int choice = InputHandler.getUserChoice(sc, 4);
         if (choice == 4) return 0;
         if (choice == 3 && stopFixedAccount) {
             System.out.println("당좌예금계좌 기간 만료");

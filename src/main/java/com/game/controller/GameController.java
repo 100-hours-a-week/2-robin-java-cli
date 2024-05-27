@@ -8,6 +8,7 @@ import com.game.vo.CheckAccount;
 import com.game.vo.FixedAccount;
 import com.game.vo.SaveAccount;
 
+import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -19,8 +20,20 @@ public class GameController {
     private static final int SAVING_WITHDRAWAL_FEE = 500;
     private static int amount = 0; // 소지 금액
 
+    //메뉴선택
+    private static final int SHOW_ACCOUNT = 1;
+    private static final int DEPOSIT = 2;
+    private static final int WITHDRAWAL = 3;
+    private static final int NEXT_MONTH = 4;
     public void startGame() {
-        Scanner sc = new Scanner(System.in);
+        Scanner sc = null;
+        try {
+            sc = new Scanner(System.in);
+        } catch (NoSuchElementException e) {
+            System.out.println("입력이 존재하지 않습니다.");
+        } catch (IllegalStateException e) {
+            System.out.println("스캐너 닫음");
+        }
         AccountService accountService = new AccountService();
         GameService gameService = new GameService();
         InputHandler inputHandler = new InputHandler();
@@ -46,7 +59,7 @@ public class GameController {
     }
 
     private void playGame(Scanner sc, Random random, CheckAccount checkAccount, SaveAccount saveAccount, FixedAccount fixedAccount, AccountService accountService, GameService gameService, InputHandler inputHandler) {
-        boolean stopFixedAccount = false;
+        boolean stopFixedAccount = false; // 고정계좌의 만기 여부를 추적하는 변수
 
         for (int i = 1; i <= END_DAY; i++) {
             System.out.println("--------------------------------------------------------------------------");
@@ -57,9 +70,9 @@ public class GameController {
                 gameService.handleMonthlyFee(checkAccount, fee);
             }
 
-            if (i == fixedAccount.getPeriod()) {
-                gameService.handleExpired(checkAccount, fixedAccount);
-                stopFixedAccount = true;
+            if (!stopFixedAccount && i == fixedAccount.getPeriod()) {
+                gameService.handleExpired(checkAccount, fixedAccount); //고정계좌의 만기처리 여부
+                stopFixedAccount = true; // 고정계좌를 만기 상태로 변경
             }
 
             gameService.handleSavingInterest(saveAccount);
@@ -73,32 +86,33 @@ public class GameController {
 
                 int action = InputHandler.getUserChoice(sc, 4);
 
-                if (handleUserAction(sc, action, checkAccount, saveAccount, fixedAccount, stopFixedAccount, inputHandler, accountService)) {
+                if (handleUserAction(sc, action, checkAccount, saveAccount, fixedAccount, stopFixedAccount, inputHandler, accountService)) { //고정계좌 만기상태라면 사용자 행동에 제약
                     stopCheck = 1;
                 } else {
                     stopCheck = 2;
                 }
             } while(stopCheck == 2);
         }
+        sc.close();
         int resultMoney = checkAccount.getBalance() + saveAccount.getBalance() + fixedAccount.getBalance();
         System.out.println("6개월 동안 총 " + resultMoney + "원을 모으셨습니다.");
     }
 
     private boolean handleUserAction(Scanner sc, int action, CheckAccount checkAccount, SaveAccount saveAccount, FixedAccount fixedAccount, boolean stopFixedAccount, InputHandler inputHandler, AccountService accountService) {
         return switch (action) {
-            case 1 -> {
+            case SHOW_ACCOUNT -> {
                 accountService.printAccountStates(checkAccount, saveAccount, fixedAccount);
                 yield false;
             }
-            case 2 -> {
+            case DEPOSIT -> {
                 amount -= accountService.depositChoice(sc, checkAccount, saveAccount, fixedAccount, inputHandler, amount, stopFixedAccount);
                 yield false;
             }
-            case 3 -> {
+            case WITHDRAWAL -> {
                 amount += accountService.withdrawalChoice(sc, checkAccount, saveAccount, fixedAccount, inputHandler, SAVING_WITHDRAWAL_FEE);
                 yield false;
             }
-            case 4 -> {
+            case NEXT_MONTH -> {
                 System.out.println("행동 종료(다음달로 넘어갑니다.)");
                 yield true;
             }
