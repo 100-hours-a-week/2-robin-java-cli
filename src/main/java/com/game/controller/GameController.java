@@ -1,7 +1,6 @@
 package com.game.controller;
 
-import com.game.service.AccountService;
-import com.game.service.GameService;
+import com.game.service.*;
 import com.game.util.InputHandler;
 import com.game.util.RulePrinter;
 import com.game.vo.CheckAccount;
@@ -25,7 +24,16 @@ public class GameController {
     private static final int DEPOSIT = 2;
     private static final int WITHDRAWAL = 3;
     private static final int NEXT_MONTH = 4;
+
+    private static final String filePath = "../bgm/hyper-space-game-208894.wav";
     public void startGame() {
+
+
+        MusicService musicService = new MusicService();
+        //파일 블루어고
+
+
+        musicService.playMusic("/hyper_space_game-208894.wav");
         Scanner sc = null;
         try {
             sc = new Scanner(System.in);
@@ -56,10 +64,17 @@ public class GameController {
 
 
         playGame(sc, random, checkAccount, saveAccount, fixedAccount, accountService, gameService, inputHandler);
+        musicService.stopMusic();
     }
 
-    private void playGame(Scanner sc, Random random, CheckAccount checkAccount, SaveAccount saveAccount, FixedAccount fixedAccount, AccountService accountService, GameService gameService, InputHandler inputHandler) {
+    private boolean playGame(Scanner sc, Random random, CheckAccount checkAccount, SaveAccount saveAccount, FixedAccount fixedAccount, AccountService accountService, GameService gameService, InputHandler inputHandler) {
         boolean stopFixedAccount = false; // 고정계좌의 만기 여부를 추적하는 변수
+        Object lock = new Object();
+        InterestRateService interestRateService = new InterestRateService(10, lock);
+        SaveMoneyService saveMoneyService = new SaveMoneyService(interestRateService, lock, 10);
+
+        interestRateService.start();
+        saveMoneyService.start();
 
         for (int i = 1; i <= END_DAY; i++) {
             System.out.println("--------------------------------------------------------------------------");
@@ -75,7 +90,7 @@ public class GameController {
                 stopFixedAccount = true; // 고정계좌를 만기 상태로 변경
             }
 
-            gameService.handleSavingInterest(saveAccount);
+            gameService.handleSavingInterest(saveAccount, interestRateService.getInterest());
 
             amount = INITAIL_MONEY;
             int stopCheck = 0;
@@ -94,8 +109,11 @@ public class GameController {
             } while(stopCheck == 2);
         }
         sc.close();
+        interestRateService.interrupt();
+        saveMoneyService.interrupt();
         int resultMoney = checkAccount.getBalance() + saveAccount.getBalance() + fixedAccount.getBalance();
         System.out.println("6개월 동안 총 " + resultMoney + "원을 모으셨습니다.");
+        return true;
     }
 
     private boolean handleUserAction(Scanner sc, int action, CheckAccount checkAccount, SaveAccount saveAccount, FixedAccount fixedAccount, boolean stopFixedAccount, InputHandler inputHandler, AccountService accountService) {

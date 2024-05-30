@@ -22,8 +22,8 @@ public class GameService {
         checkAccount.deposit(facMoney);
         System.out.println("당좌예금계좌 기간이 끝났습니다. 입출금계좌에 "+facMoney+"이 입금됩니다.");
     }
-    public void handleSavingInterest(SaveAccount saveAccount) {
-        int savemoney = saveAccount.getBalance() / 10;
+    public void handleSavingInterest(SaveAccount saveAccount, int interest) {
+        int savemoney = (saveAccount.getBalance() * interest) / 100;
         if(savemoney > 0) {
             saveAccount.deposit(savemoney);
             System.out.println("저축계좌 이자 적립");
