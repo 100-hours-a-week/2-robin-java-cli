@@ -347,5 +347,9 @@ getter/setter가 있으면 dto, 없으면 vo로 분리
     }
     ```
 
-[시연연상](https://prod-files-secure.s3.us-west-2.amazonaws.com/38552da6-340d-42c1-a9a1-b181ff331f03/5adb1d7c-3ae0-40d1-b765-030b6d03ccc8/%E1%84%92%E1%85%AA%E1%84%86%E1%85%A7%E1%86%AB_%E1%84%80%E1%85%B5%E1%84%85%E1%85%A9%E1%86%A8_2024-05-30_%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE_1.20.41.mov)
+
+https://github.com/100-hours-a-week/5-robin-java-cli/assets/84344190/c88ea3c5-9b42-497c-9304-09a03931cd7d
+
+
+
 
