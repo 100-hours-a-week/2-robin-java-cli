@@ -348,8 +348,17 @@ getter/setter가 있으면 dto, 없으면 vo로 분리
     ```
 
 
-https://github.com/100-hours-a-week/5-robin-java-cli/assets/84344190/c88ea3c5-9b42-497c-9304-09a03931cd7d
+# 게임 시작
+![GIFMaker_me](https://github.com/100-hours-a-week/5-robin-java-cli/assets/84344190/c73b369b-919d-4a98-87d2-1559639433e8)
 
+# 게임 설명
+![GIFMaker_me (1)](https://github.com/100-hours-a-week/5-robin-java-cli/assets/84344190/36aef85d-7431-4177-91e3-6c532de9daf5)
+
+# 게임 진행
+![GIFMaker_me (4)](https://github.com/100-hours-a-week/5-robin-java-cli/assets/84344190/5a7cc486-848a-462f-baaa-7c482afe8b8d)
+
+# 게임 결과
+![GIFMaker_me (5)](https://github.com/100-hours-a-week/5-robin-java-cli/assets/84344190/3ead7e0e-0c50-4047-83dd-1eb87b07210f)
 
 
 
